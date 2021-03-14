@@ -124,3 +124,29 @@ TEST(List, Pop){
 
 }
 
+
+TEST(List, Move){
+ 	A a{0};
+	A b{1};
+	A c{2};
+
+	detail::List l1;
+	detail::List l2;
+
+	l1.push_back(a);
+	l1.push_back(b);
+	l1.push_back(c);
+
+	l2.push_back(b);
+
+	ASSERT_EQ(l1.size(), 2);
+	ASSERT_EQ(l2.size(), 1);
+
+
+	ASSERT_EQ(l2.first(), &b);
+	ASSERT_EQ(l2.last(), &b);
+
+	ASSERT_EQ(l1.first(), &a);
+	ASSERT_EQ(l1.last(), &c);
+}
+
