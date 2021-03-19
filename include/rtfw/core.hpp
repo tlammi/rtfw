@@ -1,6 +1,10 @@
 #pragma once
 
-namespace rtfw{
+#include "rtfw/detail/core.hpp"
 
-void run();
+
+namespace rtfw{
+void run(){
+	detail::core.run();
+}
 }

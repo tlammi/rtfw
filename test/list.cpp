@@ -39,11 +39,11 @@ TEST(List, Push){
 	l.push_back(c);
 	auto* iter = l.first();
 	ASSERT_EQ(static_cast<A*>(iter)->i, 0);
-	iter = l.next(*iter);
+	iter = detail::List::next(*iter);
 	ASSERT_EQ(static_cast<A*>(iter)->i, 1);
-	iter = l.next(*iter);
+	iter = detail::List::next(*iter);
 	ASSERT_EQ(static_cast<A*>(iter)->i, 2);
-	iter = l.next(*iter);
+	iter = detail::List::next(*iter);
 	ASSERT_EQ(iter, nullptr);
 }
 
@@ -62,13 +62,13 @@ TEST(List, Insert){
 
 	auto* iter = l.first();
 	ASSERT_EQ(static_cast<A*>(iter)->i, 1);
-	iter = l.next(*iter);
+	iter = detail::List::next(*iter);
 	ASSERT_EQ(static_cast<A*>(iter)->i, 3);
-	iter = l.next(*iter);
+	iter = detail::List::next(*iter);
 	ASSERT_EQ(static_cast<A*>(iter)->i, 0);
-	iter = l.next(*iter);
+	iter = detail::List::next(*iter);
 	ASSERT_EQ(static_cast<A*>(iter)->i, 4);
-	iter = l.next(*iter);
+	iter = detail::List::next(*iter);
 	ASSERT_EQ(static_cast<A*>(iter)->i, 2);
 	ASSERT_EQ(iter, l.last());
 
@@ -95,7 +95,7 @@ TEST(List, Iterate){
 	int expected=0;
 	while(iter){
 		ASSERT_EQ(static_cast<A*>(iter)->i, expected);
-		iter = l.next(*iter);
+		iter = detail::List::next(*iter);
 		++expected;
 	}
 	iter = l.last();
@@ -148,5 +148,24 @@ TEST(List, Move){
 
 	ASSERT_EQ(l1.first(), &a);
 	ASSERT_EQ(l1.last(), &c);
+
+	ASSERT_EQ(detail::List::next(*l1.first()), l1.last());
+	ASSERT_EQ(detail::List::next(*l2.first()), nullptr);
+}
+
+
+TEST(List, Find){
+	A a{0};
+	A b{0};
+	A c{0};
+
+
+	detail::List l;
+	l.push_back(a);
+	l.push_back(b);
+
+	ASSERT_TRUE(l.find(a));
+	ASSERT_TRUE(l.find(b));
+	ASSERT_FALSE(l.find(c));
 }
 

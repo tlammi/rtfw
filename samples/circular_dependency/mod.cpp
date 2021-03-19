@@ -5,22 +5,22 @@ struct Mod3;
 
 struct Mod1{
 	
-	Mod1(): selfref{rtfw::module<Mod2>()}{}
-	rtfw::ModuleRef<Mod2> selfref;
+	Mod1(): ref{rtfw::module<Mod2>()}{}
+	Mod2* ref;
 };
 
 
 struct Mod2{
 	
-	Mod2(): selfref{rtfw::module<Mod3>()}{}
-	rtfw::ModuleRef<Mod3> selfref;
+	Mod2(): ref{rtfw::module<Mod3>()}{}
+	Mod3* ref;
 };
 
 
 struct Mod3{
 	
-	Mod3(): selfref{rtfw::module<Mod1>()}{}
-	rtfw::ModuleRef<Mod1> selfref;
+	Mod3(): ref{rtfw::module<Mod1>()}{}
+	Mod1* ref;
 };
 
 

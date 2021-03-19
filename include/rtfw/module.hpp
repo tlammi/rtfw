@@ -1,15 +1,17 @@
 #pragma once
 
-#include "rtfw/refcountedmodule.hpp"
+#include "rtfw/detail/module.hpp"
+#include "rtfw/detail/core.hpp"
 
-#define RTFW_MODULE(name) ::rtfw::RefCountedModule<name> RTFW_MODULE_ ## name{#name}
 
-namespace rtfw {
+#define RTFW_MODULE(cls) \
+	::rtfw::detail::ModuleHolderImpl< cls > RTFW_MODULE_HOLDER_ ## cls { #cls }
+
+namespace rtfw{
 
 template<class T>
-ModuleRef<T> module(){
-	auto ptr = detail::typed_module<T>();
-	if(!ptr) throw std::runtime_error("No module found");
-	return ptr->module_ref();
+T* module(){
+	return detail::core.module<T>();
 }
+
 }

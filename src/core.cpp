@@ -1,5 +1,5 @@
 #include "rtfw/core.hpp"
-#include "rtfw/refcountedmodule.hpp"
+#include "rtfw/module.hpp"
 
 #include <iostream>
 #include <chrono>
@@ -21,28 +21,21 @@ void signal_handler(int){
 	running = false;
 }
 
-void init(std::set<RefCounter>& refs){
-	std::cerr << "Initializing\n";
-	for(auto [ptr, name] : detail::generic_modules()){
-		std::cerr << "Initializing " << name << '\n';
-		refs.insert(RefCounter{ptr});
-	}
 }
 
-void teardown(std::set<RefCounter>& refs){
-	std::cerr << "Tearing down\n";
-	refs.clear();
-}
+namespace detail{
+
+List init_stack{};
+
 }
 
 void run(){
 	signal(SIGINT, signal_handler);
-	std::set<RefCounter> refs{};
-	init(refs);
+	detail::List init_stack;
+	auto* init_module = detail::ModuleHolder::instances.first();
 	while(running){
 		std::cerr << "running\n";
 		std::this_thread::sleep_for(100ms);
 	}
-	teardown(refs);
 }
 }

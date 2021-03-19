@@ -1,6 +1,9 @@
 #include "rtfw/module.hpp"
 #include "mod1.hpp"
 
+
+#include <iostream>
+
 struct Mod2{
 	Mod2(): mod1_{rtfw::module<Mod1>()}{
 		std::cerr << "Mod2 ctor\n";
@@ -11,7 +14,7 @@ struct Mod2{
 		std::cerr << "Mod2 dtor\n";
 	}
 	
-	rtfw::ModuleRef<Mod1> mod1_;
+	Mod1* mod1_;
 };
 
 

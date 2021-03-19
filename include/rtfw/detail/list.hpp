@@ -90,11 +90,17 @@ public:
 		}
 	}
 
-	ListHead* next(ListHead& head) noexcept {
+	bool find(ListHead& head) noexcept {
+		auto* iter = first_;
+		while(iter && iter != &head) iter = next(*iter);
+		return iter != nullptr;
+	}
+
+	static ListHead* next(ListHead& head) noexcept {
 		return head.next_;
 	}
 
-	ListHead* prev(ListHead& head) noexcept {
+	static ListHead* prev(ListHead& head) noexcept {
 		return head.prev_;
 	}
 
