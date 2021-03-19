@@ -13,23 +13,10 @@ namespace detail{
 
 class Core{
 public:
-	Core(){}
-	~Core(){}
+	Core();
+	~Core();
 	
-	void run(){
-		ListHead* iterator = ModuleHolder::instances.first();
-		while(iterator){
-			auto* target = iterator;
-			iterator = List::next(*iterator);
-			init_stack_.push_back(*target);
-			static_cast<ModuleHolder*>(target)->init();
-			ModuleHolder::instances.push_front(*target);
-		}
-		
-		using namespace std::literals::chrono_literals;
-		std::this_thread::sleep_for(10s);
-
-	}
+	void run();
 
 	template<class T>
 	T* module(){
@@ -58,8 +45,7 @@ private:
 	List init_stack_{};
 };
 
-inline Core core{};
+extern Core core;
+
 }
-
-
 }

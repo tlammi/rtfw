@@ -4,7 +4,7 @@
 
 
 namespace rtfw{
-void run(){
+inline void run(){
 	detail::core.run();
 }
 }
