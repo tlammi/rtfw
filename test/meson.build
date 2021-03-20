@@ -9,7 +9,7 @@ tests = [
 
 
 foreach t : tests
-	e = executable(t['name'], t['srcs'], dependencies: [gtest, gtest_main], include_directories: rtfw_include)
+	e = executable(t['name'], t['srcs'], dependencies: [gtest, gtest_main], include_directories: rtfw_include, link_with: rtfwlib)
 	test(t['name'], e)
 endforeach
 
