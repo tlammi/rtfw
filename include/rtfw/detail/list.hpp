@@ -34,6 +34,12 @@ public:
 
 	~List();
 
+	List(const List&) = delete;
+	List(List&&) = delete;
+
+	List& operator=(const List&) = delete;
+	List& operator=(List&&) = delete;
+
 	void pop(ListHead& head) noexcept;
 
 	void push_back(ListHead& head)  noexcept;
