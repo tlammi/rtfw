@@ -172,3 +172,25 @@ TEST(List, Find){
 	ASSERT_FALSE(l.find(c));
 }
 
+
+TEST(List, PushSame){
+	A a{1};
+	detail::List l;
+	l.push_back(a);
+	l.push_back(a);
+	l.push_back(a);
+	l.push_back(a);
+	l.push_back(a);
+	ASSERT_EQ(l.size(), 1);
+	ASSERT_EQ(static_cast<A*>(l.first())->i, 1);
+
+	l.push_back(a);
+	l.push_back(a);
+	l.push_back(a);
+	ASSERT_EQ(l.size(), 1);
+	ASSERT_EQ(static_cast<A*>(l.first())->i, 1);
+
+	l.pop(a);
+	ASSERT_EQ(l.size(), 0);
+}
+
