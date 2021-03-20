@@ -5,6 +5,7 @@ gtest_main = dependency('gtest_main')
 tests = [
 	{'name': 'dummy', 'srcs': ['dummy.cpp']},
 	{'name': 'list', 'srcs': ['list.cpp']},
+	{'name': 'util', 'srcs': ['util.cpp']},
 ]
 
 
