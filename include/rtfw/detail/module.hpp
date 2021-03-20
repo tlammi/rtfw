@@ -17,6 +17,7 @@ public:
 	virtual ~ModuleHolder(){}
 
 	virtual std::string_view name() const noexcept = 0;
+	virtual void config() = 0;
 	virtual void init() = 0;
 	virtual void clear() = 0;
 private:
@@ -35,6 +36,11 @@ public:
 
 	std::string_view name() const noexcept final {
 		return name_;
+	}
+
+
+	void config() final {
+		T::config();
 	}
 
 	void init() final {

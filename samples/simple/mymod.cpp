@@ -4,6 +4,9 @@
 
 class MyMod{
 public:
+
+	static void config(){}
+
 	MyMod(){
 		std::cerr << "mymod ctor\n";
 	}

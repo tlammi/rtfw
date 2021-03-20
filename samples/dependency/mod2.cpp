@@ -5,6 +5,9 @@
 #include <iostream>
 
 struct Mod2{
+
+	static void config(){}
+
 	Mod2(): mod1_{rtfw::module<Mod1>()}{
 		std::cerr << "Mod2 ctor\n";
 		std::cerr << "Mod2: " << mod1_->foo() << '\n';
