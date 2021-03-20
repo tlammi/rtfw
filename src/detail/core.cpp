@@ -12,6 +12,17 @@ using namespace std::literals::chrono_literals;
 
 namespace {
 
+
+void config(List& module_list){
+	auto* iter = module_list.first();
+	while(iter){
+		auto* ptr = static_cast<ModuleHolder*>(iter);
+		std::cerr << "configuring " << ptr->name() << '\n';
+		ptr->config();
+		iter = List::next(*iter);
+	}
+}
+
 void init(List& init_stack, List& module_list){
 	ListHead* iterator = module_list.first();
 	while(iterator){
@@ -51,6 +62,7 @@ void Core::run(){
 
 	setup_ = false;
 	rtfw_thread_id_ = std::this_thread::get_id();
+	config(ModuleHolder::instances);
 	init(init_stack_, ModuleHolder::instances);
 	setup_ = true;
 	std::this_thread::sleep_for(1s);
