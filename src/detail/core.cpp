@@ -1,5 +1,5 @@
 #include "rtfw/detail/core.hpp"
-
+#include "rtfw/detail/util.hpp"
 
 #include <iostream>
 
@@ -43,8 +43,16 @@ Core::Core(){}
 Core::~Core(){}
 
 void Core::run(){
+
+	// Lambda is called in object destructor
+	Defer defer{[&](){
+		setup_ = false;
+	}};
+
+	setup_ = false;
 	rtfw_thread_id_ = std::this_thread::get_id();
 	init(init_stack_, ModuleHolder::instances);
+	setup_ = true;
 	std::this_thread::sleep_for(1s);
 	deinit(ModuleHolder::instances);
 }
@@ -52,3 +60,4 @@ void Core::run(){
 Core core{};
 }
 }
+
