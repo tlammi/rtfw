@@ -18,6 +18,7 @@ public:
 
 	virtual std::string_view name() const noexcept = 0;
 	virtual void init() = 0;
+	virtual void clear() = 0;
 private:
 };
 
@@ -38,6 +39,11 @@ public:
 
 	void init() final {
 		opt_.emplace();
+	}
+
+
+	void clear() final {
+		opt_ = std::nullopt;
 	}
 
 	T* module(){
