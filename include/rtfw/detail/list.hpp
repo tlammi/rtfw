@@ -2,6 +2,7 @@
 
 #include <utility>
 #include <cstddef>
+#include <stdexcept>
 
 namespace rtfw{
 namespace detail{
@@ -36,7 +37,20 @@ private:
 
 class List{
 public:
-	List(){}
+	List(){
+		before_.next_ = &after_;
+		after_.prev_ = &before_;
+	}
+
+
+	~List(){
+		auto* iter = before_.next_;
+		while(iter != &after_){
+			auto* deletee = iter;
+			iter = iter->next_;
+			pop(*deletee);
+		}
+	}
 
 
 	void pop(ListHead& head) noexcept {
@@ -45,37 +59,20 @@ public:
 
 	void push_back(ListHead& head)  noexcept {
 		head.free_();
-		if(!first_){
-			first_ = &head;
-		} else {
-			last_->next_ = &head;
-			head.prev_ = last_;
-		}
-		last_ = &head;
+		insert_before(after_, head);
 	}
 
 	void push_front(ListHead& head) noexcept {
 		head.free_();
-		if(!first_){
-			last_ = &head;
-		} else{
-			first_->prev_ = &head;
-			head.next_ = first_;
-		}
-		first_ = &head;
+		insert_after(before_, head);
 	}
-
 
 	void insert_before(ListHead& before, ListHead& head) noexcept {
 		head.free_();
 		auto* first = before.prev_;
 		auto* second = &head;
 		auto* third = &before;
-		if(!first){
-			push_front(head);
-		} else {
-			insert_between(first, third, second);
-		}
+		insert_between(first, third, second);
 	}
 	
 	void insert_after(ListHead& after, ListHead& head) noexcept {
@@ -83,39 +80,47 @@ public:
 		auto* first = &after;
 		auto* second = &head;
 		auto* third = after.next_;
-		if(!third){
-			push_back(head);
-		} else {
-			insert_between(first, third, second);
-		}
+		insert_between(first, third, second);
 	}
 
 	bool find(ListHead& head) noexcept {
-		auto* iter = first_;
-		while(iter && iter != &head) iter = next(*iter);
-		return iter != nullptr;
+		auto* iter = before_.next_;
+		while(iter != &after_ && iter != &head) iter = iter->next_;
+		return iter != &after_;
 	}
 
-	static ListHead* next(ListHead& head) noexcept {
-		return head.next_;
+	static ListHead* next(ListHead& head) {
+		if(!head.prev_ || !head.next_) throw std::runtime_error("Head is not a member of a list");
+		auto* next = head.next_;
+		// after_ is opaque to the user
+		if(next->next_) return next;
+		return nullptr;
 	}
 
-	static ListHead* prev(ListHead& head) noexcept {
-		return head.prev_;
+	static ListHead* prev(ListHead& head) {
+		if(!head.prev_ || !head.next_) throw std::runtime_error("Head is not a member of a list");
+		auto* prev = head.prev_;
+		// before_ is opaque to the user
+		if(prev->prev_) return prev;
+		return nullptr;
 	}
 
 	ListHead* first() noexcept {
-		return first_;
+		if(before_.next_ != &after_)
+			return before_.next_;
+		return nullptr;
 	}
 	
 	ListHead* last() noexcept {
-		return last_;
+		if(after_.prev_ != &before_)
+			return after_.prev_;
+		return nullptr;
 	}
 
 	size_t size() const noexcept{
 		size_t count=0;
-		auto* iter = first_;
-		while(iter){
+		auto* iter = before_.next_;
+		while(iter != &after_){
 			++count;
 			iter = iter->next_;
 		}
@@ -130,8 +135,8 @@ private:
 		head->next_ = last;
 	}
 
-	ListHead* first_{nullptr};
-	ListHead* last_{nullptr};
+	ListHead before_{};
+	ListHead after_{};
 };
 
 }

@@ -35,7 +35,11 @@ TEST(List, Push){
 	A c{2};
 	detail::List l;
 	l.push_back(b);
+	ASSERT_EQ(static_cast<A*>(l.first())->i, 1);
 	l.push_front(a);
+	ASSERT_EQ(l.size(), 2);
+	ASSERT_EQ(static_cast<A*>(l.last())->i, 1);
+	ASSERT_EQ(static_cast<A*>(l.first())->i, 0);
 	l.push_back(c);
 	auto* iter = l.first();
 	ASSERT_EQ(static_cast<A*>(iter)->i, 0);
@@ -158,7 +162,6 @@ TEST(List, Find){
 	A a{0};
 	A b{0};
 	A c{0};
-
 
 	detail::List l;
 	l.push_back(a);
