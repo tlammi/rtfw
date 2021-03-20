@@ -35,12 +35,15 @@ void deinit(List& module_list){
 	}
 
 }
+
 }
 
 Core::Core(){}
 
 Core::~Core(){}
+
 void Core::run(){
+	rtfw_thread_id_ = std::this_thread::get_id();
 	init(init_stack_, ModuleHolder::instances);
 	std::this_thread::sleep_for(1s);
 	deinit(ModuleHolder::instances);

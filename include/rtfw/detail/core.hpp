@@ -7,6 +7,7 @@
 
 #include "rtfw/detail/list.hpp"
 #include "rtfw/detail/module.hpp"
+#include "rtfw/detail/assertion.hpp"
 
 namespace rtfw{
 namespace detail{
@@ -20,6 +21,9 @@ public:
 
 	template<class T>
 	T* module(){
+
+		assert_eq(std::this_thread::get_id(), rtfw_thread_id_, "module() is not threadsafe");
+
 		auto* holder = ModuleHolderImpl<T>::instance;
 		if(!holder) throw std::runtime_error("Module not found");
 		if(!holder->module()){
@@ -41,8 +45,8 @@ public:
 	}
 
 private:
-
 	List init_stack_{};
+	std::thread::id rtfw_thread_id_{};
 };
 
 extern Core core;
