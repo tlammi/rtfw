@@ -8,6 +8,9 @@ namespace rtfw {
 
 class Config{
 public:
+
+	using MapVect = std::vector<std::pair<std::string, std::string>>;
+
 	Config(std::string_view name="", const std::vector<std::string_view>& keys={}):
 		name_{name} {
 		for(const auto& k: keys){
@@ -43,10 +46,19 @@ public:
 		match->second = val;
 	}
 
+
+	MapVect::const_iterator begin() const {
+		return map_.begin();
+	}
+
+	MapVect::const_iterator end() const {
+		return map_.end();
+	}
+
 private:
 
 
-	std::vector<std::pair<std::string, std::string>>::const_iterator find_(std::string_view key) const {
+	MapVect::const_iterator find_(std::string_view key) const {
 		const auto match = std::lower_bound(map_.begin(), map_.end(), key,
 			[](const auto& pair, const auto& key){ return pair.first < key; });
 		if(match->first == key)
@@ -54,7 +66,7 @@ private:
 		throw std::runtime_error("Invalid key");
 	}
 
-	std::vector<std::pair<std::string, std::string>>::iterator find_(std::string_view key) {
+	MapVect::iterator find_(std::string_view key) {
 		auto match = std::lower_bound(map_.begin(), map_.end(), key,
 			[](const auto& pair, const auto& key){ return pair.first < key; });
 		if(match->first == key)
@@ -67,7 +79,7 @@ private:
 };
 
 template<>
-std::string_view Config::value<std::string_view>(std::string_view key) const {
+inline std::string_view Config::value<std::string_view>(std::string_view key) const {
 	auto match = find_(key);
 	return match->second;
 }

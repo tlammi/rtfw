@@ -42,3 +42,26 @@ TEST(Config, ConstAccess){
 	lambda(c0);
 }
 
+TEST(Config, Iterate){
+	Config c{"conf", {"a", "b", "c", "d"}};
+	c.set("a", "A");
+	c.set("b", "B");
+	c.set("c", "C");
+	c.set("d", "D");
+
+	auto iter = c.begin();
+	ASSERT_EQ(iter->first, "a");
+	ASSERT_EQ(iter->second, "A");
+	++iter;
+	ASSERT_EQ(iter->first, "b");
+	ASSERT_EQ(iter->second, "B");
+	++iter;
+	ASSERT_EQ(iter->first, "c");
+	ASSERT_EQ(iter->second, "C");
+	++iter;
+	ASSERT_EQ(iter->first, "d");
+	ASSERT_EQ(iter->second, "D");
+	++iter;
+	ASSERT_EQ(iter, c.end());
+
+}
