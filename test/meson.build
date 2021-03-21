@@ -7,6 +7,7 @@ tests = [
 	{'name': 'list', 'srcs': ['list.cpp']},
 	{'name': 'util', 'srcs': ['util.cpp']},
 	{'name': 'assertion', 'srcs': ['assertion.cpp']},
+	{'name': 'config', 'srcs': ['config.cpp']},
 ]
 
 
