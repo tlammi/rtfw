@@ -13,6 +13,41 @@ class VectorMap{
 	using Map = std::vector<std::pair<K, V>>;
 public:
 
+
+	class ConstIterator{
+	public:
+		ConstIterator(typename Map::const_iterator iter): iter_{iter}{}
+
+		
+		const auto* operator->() const {
+			return iter_.operator->();
+		}
+
+		const auto& operator*() const {
+			return iter_.operator*();
+		}
+
+		ConstIterator& operator++(){
+			++iter_;
+			return *this;
+		}
+
+		ConstIterator& operator--(){
+			--iter_;
+			return *this;
+		}
+		
+		bool operator==(const ConstIterator& rhs) const {
+			return iter_ == rhs.iter_;
+		}
+		
+		bool operator!=(const ConstIterator& rhs) const {
+			return (*this) == rhs;
+		}
+	private:
+		typename Map::const_iterator iter_;
+	};
+
 	VectorMap(const std::initializer_list<K>& keys){
 		map_.reserve(keys.size());
 		for(const auto& k: keys){
@@ -54,6 +89,15 @@ public:
 		for(const auto& pair: map_)
 			if(pair.second == v) return true;
 		return false;
+	}
+
+
+	ConstIterator begin() const {
+		return ConstIterator(map_.begin());
+	}
+
+	ConstIterator end() const {
+		return ConstIterator(map_.end());
 	}
 
 private:

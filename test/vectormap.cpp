@@ -55,3 +55,20 @@ TEST(VectorMap, HasValue){
 	ASSERT_TRUE(v.has_value(1000));
 	ASSERT_FALSE(v.has_value(2));
 }
+
+
+TEST(VectorMap, Iterate){
+	VectorMap<int, std::string> v{{4,1,2,3}};
+
+	v[1] = "10";
+	v[2] = "2";
+	v[3] = "1";
+	v[4] = "7";
+	
+	int last = 0;
+	for(const auto& iter: v){
+		ASSERT_GT(iter.first, last);
+		last = iter.first;
+	}
+
+}
