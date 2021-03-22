@@ -4,7 +4,12 @@ rtfw_include = include_directories('include')
 
 boostlib = dependency('boost', modules: ['program_options'])
 
-rtfwlib = library('rtfw', ['src/detail/core.cpp', 'src/detail/list.cpp'], include_directories: 'include', dependencies: boostlib)
+rtfw_srcs=[
+	'src/detail/core.cpp',
+	'src/detail/list.cpp',
+	'src/detail/util.cpp',
+]
+rtfwlib = library('rtfw', rtfw_srcs, include_directories: 'include', dependencies: boostlib)
 subdir('samples')
 
 subdir('test')

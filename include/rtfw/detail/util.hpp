@@ -1,6 +1,8 @@
 #pragma once
 
 #include <utility>
+#include <vector>
+#include <string_view>
 
 namespace rtfw{
 namespace detail{
@@ -26,5 +28,7 @@ public:
 private:
 	F f_;
 };
+std::vector<std::string_view> split(std::string_view input, std::string_view separator);
+
 }
 }
