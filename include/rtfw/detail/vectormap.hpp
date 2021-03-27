@@ -18,13 +18,12 @@ public:
 	public:
 		ConstIterator(typename Map::const_iterator iter): iter_{iter}{}
 
-		
-		const auto* operator->() const {
-			return iter_.operator->();
+		typename Map::const_pointer operator->() const {
+			return &(*iter_);
 		}
 
-		const auto& operator*() const {
-			return iter_.operator*();
+		typename Map::const_reference operator*() const {
+			return *iter_;
 		}
 
 		ConstIterator& operator++(){
@@ -51,7 +50,7 @@ public:
 	VectorMap(const std::initializer_list<K>& keys){
 		map_.reserve(keys.size());
 		for(const auto& k: keys){
-			map_.push_back({k, {}});
+			map_.emplace_back(K{k}, V{});
 		}
 
 		std::sort(map_.begin(), map_.end(),
@@ -60,17 +59,34 @@ public:
 			});
 	}
 
+	template<class Container>
+	VectorMap(Container&& keys){
+		map_.reserve(keys.size());
+		for(const auto& k: keys){
+			map_.emplace_back(K{k}, V{});
+		}
 
-	VectorMap(const VectorMap&) = default;
-	VectorMap(VectorMap&&) = default;
-	VectorMap& operator=(const VectorMap&) = default;
-	VectorMap& operator=(VectorMap&&) = default;
-
-	V& operator[](const K& k){
-		return find_(k);
+		std::sort(map_.begin(), map_.end(),
+			[](const auto& lhs, const auto& rhs){
+				return lhs.first < rhs.first;
+			});
+		
 	}
 
-	const V& operator[](const K& k) const {
+
+	VectorMap(const VectorMap&) = delete;
+	VectorMap(VectorMap&&) = default;
+
+	VectorMap& operator=(const VectorMap&) = delete;
+	VectorMap& operator=(VectorMap&&) = default;
+	
+	template<class K2>
+	V& operator[](const K2& k){
+		return find_(k);
+	}
+	
+	template<class K2>
+	const V& operator[](const K2& k) const {
 		return find_(k);
 	}
 
@@ -92,17 +108,18 @@ public:
 	}
 
 
-	ConstIterator begin() const {
-		return ConstIterator(map_.begin());
+	auto begin() const {
+		return map_.begin();
 	}
 
-	ConstIterator end() const {
-		return ConstIterator(map_.end());
+	auto end() const {
+		return map_.end();
 	}
 
 private:
 	
-	V& find_(const K& k){
+	template<class K2>
+	V& find_(const K2& k){
 		auto match = std::lower_bound(map_.begin(), map_.end(), k,
 				[](const auto& lhs, const auto& rhs){
 					return lhs.first < rhs;
@@ -111,8 +128,9 @@ private:
 			return match->second;
 		throw std::runtime_error("Key not found");
 	}
-
-	const V& find_(const K& k) const {
+	
+	template<class K2>
+	const V& find_(const K2& k) const {
 		auto match = std::lower_bound(map_.begin(), map_.end(), k,
 				[](const auto& lhs, const auto& rhs){
 					return lhs.first < rhs;

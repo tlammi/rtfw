@@ -66,9 +66,13 @@ TEST(VectorMap, Iterate){
 	v[4] = "7";
 	
 	int last = 0;
+	int counter=0;
 	for(const auto& iter: v){
 		ASSERT_GT(iter.first, last);
+		++counter;
 		last = iter.first;
 	}
+
+	ASSERT_EQ(counter, 4);
 
 }
