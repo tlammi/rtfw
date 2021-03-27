@@ -9,11 +9,12 @@ tests = [
 	{'name': 'assertion', 'srcs': ['assertion.cpp']},
 	{'name': 'config', 'srcs': ['config.cpp']},
 	{'name': 'vectormap', 'srcs': ['vectormap.cpp']},
+	{'name': 'propertytree', 'srcs': ['propertytree.cpp']},
 ]
 
 
 foreach t : tests
-	e = executable(t['name'], t['srcs'], dependencies: [gtest, gtest_main], include_directories: rtfw_include, link_with: rtfwlib)
+	e = executable(t['name'], t['srcs'], dependencies: [gtest, gtest_main], include_directories: [rtfw_include, rtfw_src_include], link_with: rtfwlib)
 	test(t['name'], e)
 endforeach
 

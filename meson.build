@@ -1,6 +1,7 @@
 project('rtfw_project', 'cpp', default_options : ['cpp_std=c++17'])
 
 rtfw_include = include_directories('include')
+rtfw_src_include = include_directories('src/detail')
 
 boostlib = dependency('boost', modules: ['program_options'])
 
