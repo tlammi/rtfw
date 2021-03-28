@@ -196,6 +196,8 @@ public:
 
 	Node& operator[](std::string_view key);
 
+	Dict& operator-=(const Dict& other);
+
 	Dict& left_union(const Dict& other);
 	Dict& right_union(const Dict& other);
 

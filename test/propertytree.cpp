@@ -90,5 +90,26 @@ TEST(PropertyTree, Intersection){
 	ASSERT_EQ(intersected1["Mod1"].as_dict()["key1"].as_scalar(), "foo");
 	ASSERT_EQ(intersected0["Mod1"].as_dict().size(), 1);
 	ASSERT_EQ(intersected1["Mod1"].as_dict().size(), 1);
+}
 
+
+TEST(PropertyTree, Subtract){
+	pt::Dict d0{};
+	pt::Dict d1{};
+	pt::Dict expected{};
+	const pt::Dict empty{};
+
+	d0["a"] = pt::Dict();
+	d0["a"].as_dict()["ab"] = 10;
+	d0["b"] = pt::List();
+
+	d1["a"] = pt::Dict();
+	d1["a"].as_dict()["ab"] = pt::List();
+
+	expected["a"] = pt::Dict();
+	expected["b"] = pt::List();
+	
+	d0 -= d1;
+	ASSERT_EQ(d0, expected);
+	ASSERT_NE(d0, empty);
 }

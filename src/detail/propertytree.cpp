@@ -30,6 +30,20 @@ Node& Dict::operator[](std::string_view str){
 	return iter->second;
 }
 
+
+Dict& Dict::operator-=(const Dict& other){
+	for(const auto& [key, onode]: other){
+		if(auto* tnode = try_at(*this, key)){
+			if(onode.type() == Node::Type::Dict && tnode->type() == Node::Type::Dict){
+				tnode->as_dict() -= onode.as_dict();
+			} else{
+				erase(key);
+			}
+		}
+	}
+	return *this;
+}
+
 Dict& Dict::left_union(const Dict& other){
 	for(const auto& [key, onode] : other){
 		if(auto tnode = try_at(*this, key)){
