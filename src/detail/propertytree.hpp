@@ -105,34 +105,9 @@ public:
 		Dict,
 	};
 
-	Node(const Config& conf): NodeBase{Dict()} {
-		as_dict()[std::string(conf.name())] = Dict();
-		for(const auto& [key, value]: conf){
-			as_dict()[std::string(conf.name())].as_dict()[key] = value;
-		}
-	}
+	Node(const Config& conf);
 
-	Node(const boostpt::ptree& tree){
-		if(tree.empty()){
-			// Leaf node
-			*this = Scalar(tree.get_value<std::string>());
-
-		} else if(tree.find("") != tree.not_found()){
-			// List
-			*this = List();
-			for(const auto& [key, subtree]: tree){
-				(void)key;
-				as_list().emplace_back(subtree);
-			}
-		} else{
-			// Dict
-			*this = Dict();
-			for(const auto& [key, subtree]: tree){
-				as_dict()[key] = Node(subtree);
-			}
-		}
-	}
-
+	Node(const boostpt::ptree& tree);
 
 	Node(const Node&) = default;
 	Node& operator=(const Node&) = default;
@@ -140,49 +115,25 @@ public:
 	Node(Node&&) = default;
 	Node& operator=(Node&&) = default;
 
-	Type type() const {
-		if(is_scalar()) return Type::Scalar;
-		if(is_list()) return Type::List;
-		if(is_dict()) return Type::Dict;
-		throw std::runtime_error("Unknown state");
-	}
+	Type type() const;
 	
-	bool is_scalar() const noexcept {
-		return std::holds_alternative<Scalar>(*this);
-	}
+	bool is_scalar() const noexcept;
 
-	bool is_list() const noexcept {
-		return std::holds_alternative<List>(*this);
-	}
+	bool is_list() const noexcept;
 
-	bool is_dict() const noexcept {
-		return std::holds_alternative<Dict>(*this);
-	}
+	bool is_dict() const noexcept;
 	
-	Scalar& as_scalar() {
-		return std::get<Scalar>(*this);
-	}
+	Scalar& as_scalar();
 	
-	const Scalar& as_scalar() const {
-		return std::get<Scalar>(*this);
-	}
+	const Scalar& as_scalar() const;
 
-	List& as_list() {
-		return std::get<List>(*this);
-	}
+	List& as_list();
 
-	const List& as_list() const {
-		return std::get<List>(*this);
-	}
+	const List& as_list() const;
 
-	Dict& as_dict() {
-		return std::get<Dict>(*this);
-	}
+	Dict& as_dict();
 
-	const Dict& as_dict() const {
-		return std::get<Dict>(*this);
-	}
-
+	const Dict& as_dict() const;
 };
 
 

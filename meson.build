@@ -9,6 +9,7 @@ rtfw_srcs=[
 	'src/detail/core.cpp',
 	'src/detail/list.cpp',
 	'src/detail/util.cpp',
+	'src/detail/propertytree.cpp',
 ]
 rtfwlib = library('rtfw', rtfw_srcs, include_directories: 'include', dependencies: boostlib)
 subdir('samples')
