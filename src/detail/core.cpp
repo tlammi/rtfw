@@ -3,6 +3,8 @@
 #include "propertytree.hpp"
 
 #include <iostream>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
 
 
 
@@ -11,12 +13,70 @@ namespace detail{
 using namespace std::literals::chrono_literals;
 
 namespace pt = propertytree;
+namespace bpt = boost::property_tree;
 
 
 namespace {
 
+template<class Iter>
+std::string join(Iter iter, Iter end){
+	std::string out{};
+	while(iter != end){
+		out += *iter;
+		++iter;
+		if(iter != end)
+			out.push_back('.');
+		else
+			break;
+	}
+	return out;
+}
 
-pt::Node config(List& module_list){
+void print_keys(const pt::Dict& d, std::vector<std::string>& stack){
+	for(const auto& [key, node] : d){
+		stack.push_back(key.cast<std::string>());
+		if(node.type() == pt::Node::Type::Dict){
+			print_keys(node.as_dict(), stack);
+		} else{
+			std::cerr << join(stack.begin(), stack.end()) << '\n';
+		}
+		stack.pop_back();
+	}
+}
+
+void validate_config_files(const pt::Dict& mod_confs, const pt::Dict& file_confs){
+	auto tmp = file_confs;
+	tmp -= mod_confs;
+	if(!tmp.empty()){
+		std::cerr << "\nWARNING: unsupported configurations in config files:\n";
+		std::vector<std::string> stack;
+		print_keys(tmp, stack);
+		std::cerr << '\n';
+	}
+}
+
+
+template<class Iter>
+pt::Node read_ini_file(Iter iter, Iter end){
+	pt::Node result{pt::Dict()};
+	while(iter != end){
+		bpt::ptree tree;
+		bpt::read_ini(*iter, tree);
+		result.as_dict().right_union(pt::Node{tree}.as_dict());
+		++iter;
+	}
+	return result;
+}
+
+pt::Node populate_configs(pt::Node&& confs){
+	std::vector ini_files{"demo.ini"};
+	auto from_files = read_ini_file(ini_files.begin(), ini_files.end());
+	validate_config_files(confs.as_dict(), from_files.as_dict());
+	confs.as_dict().right_union(from_files.as_dict());
+	return confs;
+}
+
+pt::Node invoke_configs(List& module_list){
 	auto* iter = module_list.first();
 	pt::Node dict{pt::Dict()};
 	while(iter){
@@ -75,7 +135,8 @@ void Core::run(){
 
 	setup_ = false;
 	rtfw_thread_id_ = std::this_thread::get_id();
-	config(ModuleHolder::instances);
+	auto configs = invoke_configs(ModuleHolder::instances);
+	configs = populate_configs(std::move(configs));
 	init(init_stack_, ModuleHolder::instances);
 	setup_ = true;
 	std::this_thread::sleep_for(1s);
