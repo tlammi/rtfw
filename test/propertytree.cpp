@@ -38,4 +38,24 @@ TEST(PropertyTree, Ctor){
 	ASSERT_EQ(n3.as_dict()["Mod2"].as_dict()["bar"].as_scalar().cast<int>(), 1);
 }
 
+TEST(PropertyTree, Union){
+	pt::Node n0{pt::Dict()};
+	pt::Node n1{pt::Dict()};
+	
+	n0.as_dict()["Mod1"] = pt::Dict();
+	n0.as_dict()["Mod1"].as_dict()["key0"] = 42;
+	n0.as_dict()["Mod1"].as_dict()["key1"] = "baz";
 
+	n1.as_dict()["Mod1"] = pt::Dict();
+	n1.as_dict()["Mod1"].as_dict()["key1"] = 100;
+	n1.as_dict()["Mod1"].as_dict()["key2"] = "asdf";
+	
+	pt::Dict joined;
+	joined.left_union(n0.as_dict());
+	joined.left_union(n1.as_dict());
+
+	ASSERT_EQ(joined["Mod1"].as_dict()["key0"].as_scalar(), 42);
+	ASSERT_EQ(joined["Mod1"].as_dict()["key1"].as_scalar(), "baz");
+	ASSERT_EQ(joined["Mod1"].as_dict()["key2"].as_scalar(), "asdf");
+
+}

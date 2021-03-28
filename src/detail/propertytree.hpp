@@ -91,7 +91,21 @@ public:
 class Node;
 
 using List = std::vector<Node>;
-using Dict = std::map<Scalar, Node>;
+
+using DictBase = std::map<Scalar, Node>;
+
+class Dict: public DictBase{
+public:
+	using DictBase::DictBase;
+
+	Dict& left_union(const Dict& other);
+	Dict& right_union(const Dict& other);
+
+	Dict& left_intersect(const Dict& other);
+	Dict& right_intersect(const Dict& other);
+
+private:
+};
 
 using NodeBase = std::variant<Scalar, List, Dict>;
 

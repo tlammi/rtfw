@@ -4,6 +4,49 @@ namespace rtfw {
 namespace detail {
 namespace propertytree {
 
+namespace {
+
+Node* try_at(Dict& d, const Scalar& k){
+	if(d.count(k))
+		return &d.at(k);
+	return nullptr;
+}
+}
+
+Dict& Dict::left_union(const Dict& other){
+	for(const auto& [key, onode] : other){
+		if(auto tnode = try_at(*this, key)){
+			if(tnode->type() == Node::Type::Dict && onode.type() == Node::Type::Dict)
+				tnode->as_dict().left_union(onode.as_dict());
+		} else {
+			(*this)[key] = onode;
+		}
+	}
+	return *this;
+}
+
+Dict& Dict::right_union(const Dict& other){
+	for(const auto& [key, onode] : other){
+		if(auto tnode = try_at(*this, key)){
+			if(tnode->type() == Node::Type::Dict && onode.type() == Node::Type::Dict)
+				tnode->as_dict().right_union(onode.as_dict());
+			else
+				(*this)[key] = onode;
+		} else {
+			(*this)[key] = onode;
+		}
+	}
+	return *this;
+}
+
+Dict& Dict::left_intersect(const Dict& other){
+
+}
+
+Dict& right_intersect(const Dict& other){
+
+}
+
 Node::Node(const Config& conf): NodeBase{Dict()} {
 	as_dict()[std::string(conf.name())] = Dict();
 	for(const auto& [key, value]: conf){
