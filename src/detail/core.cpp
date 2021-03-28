@@ -18,6 +18,11 @@ namespace bpt = boost::property_tree;
 
 namespace {
 
+bool file_exists(const std::string& path){
+	std::ifstream f{path};
+	return f.good();
+}
+
 template<class Iter>
 std::string join(Iter iter, Iter end){
 	std::string out{};
@@ -60,16 +65,20 @@ template<class Iter>
 pt::Node read_ini_file(Iter iter, Iter end){
 	pt::Node result{pt::Dict()};
 	while(iter != end){
-		bpt::ptree tree;
-		bpt::read_ini(*iter, tree);
-		result.as_dict().right_union(pt::Node{tree}.as_dict());
+		if(file_exists(*iter)){
+			bpt::ptree tree;
+			bpt::read_ini(*iter, tree);
+			result.as_dict().right_union(pt::Node{tree}.as_dict());
+		} else{
+			std::cerr << "file " << *iter << " not found. Skipping\n";
+		}
 		++iter;
 	}
 	return result;
 }
 
 pt::Node populate_configs(pt::Node&& confs){
-	std::vector ini_files{"demo.ini"};
+	std::vector<std::string> ini_files{"rtfw.ini"};
 	auto from_files = read_ini_file(ini_files.begin(), ini_files.end());
 	validate_config_files(confs.as_dict(), from_files.as_dict());
 	confs.as_dict().right_union(from_files.as_dict());
