@@ -23,12 +23,14 @@ pt::Node config(List& module_list){
 		auto* ptr = static_cast<ModuleHolder*>(iter);
 		std::cerr << "configuring " << ptr->name() << '\n';
 		auto conf = ptr->config();
-		if(conf.name() != ""){
-			if(dict.as_dict().count(conf.name()))
-				throw std::runtime_error("Conflicting module names");
-			pt::Node tmp{std::move(conf)};
-			dict.as_dict().left_union(tmp.as_dict());
-		}
+		if(conf.name() == "")
+			conf.set_name(ptr->name());
+
+		if(dict.as_dict().count(conf.name()))
+			throw std::runtime_error("Conflicting module names");
+
+		pt::Node tmp{std::move(conf)};
+		dict.as_dict().left_union(tmp.as_dict());
 		iter = List::next(*iter);
 	}
 	return dict;
