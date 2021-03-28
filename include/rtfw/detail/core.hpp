@@ -39,7 +39,7 @@ public:
 				throw std::runtime_error(ss.str());
 			}
 			init_stack_.push_back(*holder);
-			holder->init();
+			holder->init(Config());
 			ModuleHolder::instances.push_front(*holder);
 		}
 		return holder->module();

@@ -8,7 +8,7 @@ struct Mod1{
 		return {};
 	}
 
-	Mod1();
+	Mod1(const rtfw::Config& conf);
 	~Mod1();
 	int foo() const;
 };

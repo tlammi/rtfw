@@ -19,7 +19,7 @@ public:
 
 	virtual std::string_view name() const noexcept = 0;
 	virtual rtfw::Config config() = 0;
-	virtual void init() = 0;
+	virtual void init(const rtfw::Config& conf) = 0;
 	virtual void clear() = 0;
 private:
 };
@@ -44,8 +44,8 @@ public:
 		return T::config();
 	}
 
-	void init() final {
-		opt_.emplace();
+	void init(const rtfw::Config& conf) final {
+		opt_.emplace(conf);
 	}
 
 

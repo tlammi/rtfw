@@ -10,7 +10,7 @@ struct Mod2{
 		return {};
 	}
 
-	Mod2(): mod1_{rtfw::module<Mod1>()}{
+	Mod2(const rtfw::Config& conf): mod1_{rtfw::module<Mod1>()}{
 		std::cerr << "Mod2 ctor\n";
 		std::cerr << "Mod2: " << mod1_->foo() << '\n';
 	}

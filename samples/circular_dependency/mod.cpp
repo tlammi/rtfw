@@ -9,7 +9,7 @@ struct Mod1{
 		return {};
 	}
 	
-	Mod1(): ref{rtfw::module<Mod2>()}{}
+	Mod1(const rtfw::Config&): ref{rtfw::module<Mod2>()}{}
 	Mod2* ref;
 };
 
@@ -20,7 +20,7 @@ struct Mod2{
 		return {};
 	}
 	
-	Mod2(): ref{rtfw::module<Mod3>()}{}
+	Mod2(const rtfw::Config&): ref{rtfw::module<Mod3>()}{}
 	Mod3* ref;
 };
 
@@ -31,7 +31,7 @@ struct Mod3{
 		return {};
 	}
 	
-	Mod3(): ref{rtfw::module<Mod1>()}{}
+	Mod3(const rtfw::Config&): ref{rtfw::module<Mod1>()}{}
 	Mod1* ref;
 };
 

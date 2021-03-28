@@ -3,7 +3,7 @@
 #include <iostream>
 #include "rtfw/module.hpp"
 
-Mod1::Mod1(){
+Mod1::Mod1(const rtfw::Config& conf){
 	std::cerr << "Mod1 ctor\n";
 }
 

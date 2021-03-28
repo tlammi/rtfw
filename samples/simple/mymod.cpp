@@ -9,7 +9,7 @@ public:
 		return {};
 	}
 
-	MyMod(){
+	MyMod(const rtfw::Config& conf){
 		std::cerr << "mymod ctor\n";
 	}
 

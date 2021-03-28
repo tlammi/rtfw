@@ -105,14 +105,14 @@ pt::Node invoke_configs(List& module_list){
 	return dict;
 }
 
-void init(List& init_stack, List& module_list){
+void init(List& init_stack, List& module_list, const pt::Node& configs){
 	ListHead* iterator = module_list.first();
 	while(iterator){
 		auto* target = iterator;
 		iterator = List::next(*iterator);
 		init_stack.push_back(*target);
 		std::cerr << "initializing " << static_cast<ModuleHolder*>(target)->name() << '\n';
-		static_cast<ModuleHolder*>(target)->init();
+		static_cast<ModuleHolder*>(target)->init(rtfw::Config());
 		module_list.push_front(*target);
 	}
 }
@@ -146,7 +146,7 @@ void Core::run(){
 	rtfw_thread_id_ = std::this_thread::get_id();
 	auto configs = invoke_configs(ModuleHolder::instances);
 	configs = populate_configs(std::move(configs));
-	init(init_stack_, ModuleHolder::instances);
+	init(init_stack_, ModuleHolder::instances, configs);
 	setup_ = true;
 	std::this_thread::sleep_for(1s);
 	deinit(ModuleHolder::instances);
