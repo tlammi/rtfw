@@ -33,7 +33,6 @@ TEST(PropertyTree, Ctor){
 	bpt::read_ini(ss, ini_tree);
 	pt::Node n3{ini_tree};
 
-	pt::print(n3);
 	ASSERT_EQ(n3.as_dict()["Mod1"].as_dict()["foo"].as_scalar().cast<std::string>(), "bar");
 	ASSERT_EQ(n3.as_dict()["Mod2"].as_dict()["bar"].as_scalar().cast<int>(), 1);
 }
@@ -62,5 +61,34 @@ TEST(PropertyTree, Union){
 	joined2.right_union(n1.as_dict());
 	joined2.right_union(n0.as_dict());
 	ASSERT_EQ(joined, joined2);
+
+}
+
+TEST(PropertyTree, Intersection){
+	pt::Dict d0{};
+	pt::Dict d1{};
+	
+	d0["Mod1"] = pt::Dict();
+	d1["Mod1"] = pt::Dict();
+
+	d0["Mod1"].as_dict()["key0"] = 10;
+	d0["Mod1"].as_dict()["key1"] = "foo";
+
+	d1["Mod1"].as_dict()["key1"] = 42;
+	d1["Mod1"].as_dict()["key2"] = "bar";
+
+
+	pt::Dict intersected0{d0};
+	intersected0.left_intersect(d1);
+
+	pt::Dict intersected1{d1};
+	intersected1.right_intersect(d0);
+
+	pt::print(intersected0);
+	pt::print(intersected1);
+	ASSERT_EQ(intersected0["Mod1"].as_dict()["key1"].as_scalar(), "foo");
+	ASSERT_EQ(intersected1["Mod1"].as_dict()["key1"].as_scalar(), "foo");
+	ASSERT_EQ(intersected0["Mod1"].as_dict().size(), 1);
+	ASSERT_EQ(intersected1["Mod1"].as_dict().size(), 1);
 
 }

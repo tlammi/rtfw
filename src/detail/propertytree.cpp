@@ -40,11 +40,38 @@ Dict& Dict::right_union(const Dict& other){
 }
 
 Dict& Dict::left_intersect(const Dict& other){
-
+	Dict tmp;
+	for(const auto& [key, onode]: other){
+		(void)onode;
+		if(this->count(key)){
+			if(this->at(key).type() == Node::Type::Dict && onode.type() == Node::Type::Dict){
+				tmp.insert(std::move(this->extract(key)));
+				tmp.at(key).as_dict().left_intersect(onode.as_dict());
+			}
+			else{
+				tmp.insert(std::move(this->extract(key)));
+			}
+		}
+	}
+	*this = std::move(tmp);
+	return *this;
 }
 
-Dict& right_intersect(const Dict& other){
-
+Dict& Dict::right_intersect(const Dict& other){
+	Dict tmp;
+	for(const auto& [key, onode]: other){
+		if(this->count(key)){
+			if(this->at(key).type() == Node::Type::Dict && onode.type() == Node::Type::Dict){
+				tmp.insert(std::move(this->extract(key)));
+				tmp.at(key).as_dict().right_intersect(onode.as_dict());
+			}
+			else{
+				tmp[key] = onode;
+			}
+		}
+	}
+	*this = tmp;
+	return *this;
 }
 
 Node::Node(const Config& conf): NodeBase{Dict()} {
