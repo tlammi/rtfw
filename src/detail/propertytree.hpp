@@ -14,11 +14,55 @@ namespace propertytree {
 
 namespace boostpt = boost::property_tree;
 
+template<class, class, class=void>
+struct eq_comparable: std::false_type{};
+
+template<class T, class U>
+struct eq_comparable<T, U, std::void_t<decltype(std::declval<T>() == std::declval<U>())>>: std::true_type{};
+
+template<class T, class U>
+constexpr bool eq_comparable_v = eq_comparable<T, U>::value;
+
+template<class Variant, class T>
+struct variant_eq_comparable: std::false_type{};
+
+template<class T, class... Ts>
+struct variant_eq_comparable<std::variant<Ts...>, T>{
+	static constexpr bool value = std::disjunction_v<eq_comparable<Ts, T>...>;
+};
+
 using ScalarBase = std::variant<int, double, std::string>;
+
 
 class Scalar: public ScalarBase {
 public:
 	using ScalarBase::ScalarBase;
+
+	template<class T>
+	bool operator==(T&& t) const noexcept {
+		static_assert(variant_eq_comparable<std::variant<int, double, std::string>, T>::value,
+				"No known comparison with any variant type");
+
+		if constexpr (eq_comparable_v<int, T>){
+			if(std::holds_alternative<int>(*this))
+				return std::get<int>(*this) == t;
+		}
+		if constexpr (eq_comparable_v<double, T>){
+			if(std::holds_alternative<double>(*this))
+				return std::get<double>(*this) == t;
+		}
+
+		if constexpr (eq_comparable_v<std::string, T>){
+			if(std::holds_alternative<std::string>(*this))
+				return std::get<std::string>(*this) == t;
+		}
+		return false;
+	}
+	
+	template<class T>
+	bool operator!=(T&& t) const noexcept {
+		return !((*this) == t);
+	}
 
 	template<class T>
 	T& as(){
@@ -89,6 +133,13 @@ public:
 		}
 	}
 
+
+	Node(const Node&) = default;
+	Node& operator=(const Node&) = default;
+
+	Node(Node&&) = default;
+	Node& operator=(Node&&) = default;
+
 	Type type() const {
 		if(is_scalar()) return Type::Scalar;
 		if(is_list()) return Type::List;
@@ -131,12 +182,13 @@ public:
 	const Dict& as_dict() const {
 		return std::get<Dict>(*this);
 	}
+
 };
+
 
 std::string indent_str(int indent){
 	return std::string(indent*4, ' ');
 }
-
 
 void print(const Scalar& s, int indent){
 	std::cerr << indent_str(indent) << s.cast<std::string>() << '\n';

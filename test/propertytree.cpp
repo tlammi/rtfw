@@ -38,3 +38,4 @@ TEST(PropertyTree, Ctor){
 	ASSERT_EQ(n3.as_dict()["Mod2"].as_dict()["bar"].as_scalar().cast<int>(), 1);
 }
 
+
