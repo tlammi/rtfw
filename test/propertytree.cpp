@@ -58,4 +58,9 @@ TEST(PropertyTree, Union){
 	ASSERT_EQ(joined["Mod1"].as_dict()["key1"].as_scalar(), "baz");
 	ASSERT_EQ(joined["Mod1"].as_dict()["key2"].as_scalar(), "asdf");
 
+	pt::Dict joined2;
+	joined2.right_union(n1.as_dict());
+	joined2.right_union(n0.as_dict());
+	ASSERT_EQ(joined, joined2);
+
 }

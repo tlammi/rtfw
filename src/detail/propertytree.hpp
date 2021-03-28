@@ -38,7 +38,7 @@ class Scalar: public ScalarBase {
 public:
 	using ScalarBase::ScalarBase;
 
-	template<class T>
+	template<class T, class=std::enable_if_t<!std::is_same_v<std::decay_t<T>, Scalar>>>
 	bool operator==(T&& t) const noexcept {
 		static_assert(variant_eq_comparable<std::variant<int, double, std::string>, T>::value,
 				"No known comparison with any variant type");
@@ -58,6 +58,7 @@ public:
 		}
 		return false;
 	}
+
 	
 	template<class T>
 	bool operator!=(T&& t) const noexcept {
@@ -128,6 +129,21 @@ public:
 
 	Node(Node&&) = default;
 	Node& operator=(Node&&) = default;
+
+	template<class T, class=std::enable_if_t<!std::is_same_v<std::decay_t<T>, Node>>>
+	bool operator==(const T& t) const {
+		static_assert(variant_eq_comparable<NodeBase, T>::value, "No known comparison with variant types");
+		if constexpr (eq_comparable_v<Scalar, T>)
+			if(std::holds_alternative<Scalar>(*this))
+				return std::get<Scalar>(*this) == t;
+		if constexpr (eq_comparable_v<List, T>)
+			if(std::holds_alternative<List>(*this))
+				return std::get<List>(*this) == t;
+		if constexpr (eq_comparable_v<Dict, T>)
+			if(std::holds_alternative<Dict>(*this))
+				return std::get<Dict>(*this) == t;
+		return false;
+	}
 
 	Type type() const;
 	
