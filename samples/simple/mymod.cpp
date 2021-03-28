@@ -5,7 +5,9 @@
 class MyMod{
 public:
 
-	static void config(){}
+	static rtfw::Config config(){
+		return {};
+	}
 
 	MyMod(){
 		std::cerr << "mymod ctor\n";

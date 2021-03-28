@@ -1,9 +1,12 @@
 #pragma once
 
+#include "rtfw/module.hpp"
 
 struct Mod1{
 
-	static void config(){}
+	static rtfw::Config config(){
+		return {};
+	}
 
 	Mod1();
 	~Mod1();

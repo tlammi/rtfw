@@ -3,6 +3,7 @@
 #include <optional>
 #include <string_view>
 #include "rtfw/detail/list.hpp"
+#include "rtfw/config.hpp"
 
 namespace rtfw{
 namespace detail{
@@ -17,7 +18,7 @@ public:
 	virtual ~ModuleHolder(){}
 
 	virtual std::string_view name() const noexcept = 0;
-	virtual void config() = 0;
+	virtual rtfw::Config config() = 0;
 	virtual void init() = 0;
 	virtual void clear() = 0;
 private:
@@ -39,8 +40,8 @@ public:
 	}
 
 
-	void config() final {
-		T::config();
+	Config config() final {
+		return T::config();
 	}
 
 	void init() final {

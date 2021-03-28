@@ -6,7 +6,9 @@
 
 struct Mod2{
 
-	static void config(){}
+	static rtfw::Config config(){
+		return {};
+	}
 
 	Mod2(): mod1_{rtfw::module<Mod1>()}{
 		std::cerr << "Mod2 ctor\n";

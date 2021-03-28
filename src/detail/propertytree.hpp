@@ -31,6 +31,41 @@ struct variant_eq_comparable<std::variant<Ts...>, T>{
 	static constexpr bool value = std::disjunction_v<eq_comparable<Ts, T>...>;
 };
 
+template<class, class, class=void>
+struct lt_comparable: std::false_type{};
+
+template<class T, class U>
+struct lt_comparable<T, U, std::void_t<decltype(std::declval<T>() < std::declval<U>())>>: std::true_type{};
+
+template<class T, class U>
+constexpr bool lt_comparable_v = lt_comparable<T, U>::value;
+
+template<class Variant, class T>
+struct variant_lt_comparable: std::false_type{};
+
+template<class T, class... Ts>
+struct variant_lt_comparable<std::variant<Ts...>, T>{
+	static constexpr bool value = std::disjunction_v<lt_comparable<Ts, T>...>;
+};
+
+template<class, class, class=void>
+struct gt_comparable: std::false_type{};
+
+template<class T, class U>
+struct gt_comparable<T, U, std::void_t<decltype(std::declval<T>() < std::declval<U>())>>: std::true_type{};
+
+template<class T, class U>
+constexpr bool gt_comparable_v = gt_comparable<T, U>::value;
+
+template<class Variant, class T>
+struct variant_gt_comparable: std::false_type{};
+
+template<class T, class... Ts>
+struct variant_gt_comparable<std::variant<Ts...>, T>{
+	static constexpr bool value = std::disjunction_v<gt_comparable<Ts, T>...>;
+};
+
+
 using ScalarBase = std::variant<int, double, std::string>;
 
 
@@ -65,6 +100,56 @@ public:
 		return !((*this) == t);
 	}
 
+	template<class T, class=std::enable_if_t<!std::is_same_v<std::decay_t<T>, Scalar>>>
+	bool operator<(T&& t) const noexcept {
+		static_assert(variant_lt_comparable<std::variant<int, double, std::string>, T>::value,
+				"No known comparison with any variant type");
+		if constexpr (lt_comparable_v<int, T>){
+			if(std::holds_alternative<int>(*this))
+				return std::get<int>(*this) < t;
+		}
+		if constexpr (lt_comparable_v<double, T>){
+			if(std::holds_alternative<double>(*this))
+				return std::get<double>(*this) < t;
+		}
+
+		if constexpr (lt_comparable_v<std::string, T>){
+			if(std::holds_alternative<std::string>(*this))
+				return std::get<std::string>(*this) < t;
+		}
+		return false;
+	}
+
+	template<class T>
+	bool operator>=(T&& t) const noexcept {
+		return !((*this) < t);
+	}
+
+	template<class T, class=std::enable_if_t<!std::is_same_v<std::decay_t<T>, Scalar>>>
+	bool operator>(T&& t) const noexcept {
+		static_assert(variant_gt_comparable<std::variant<int, double, std::string>, T>::value,
+				"No known comparison with any variant type");
+
+		if constexpr (gt_comparable_v<int, T>){
+			if(std::holds_alternative<int>(*this))
+				return std::get<int>(*this) > t;
+		}
+		if constexpr (gt_comparable_v<double, T>){
+			if(std::holds_alternative<double>(*this))
+				return std::get<double>(*this) > t;
+		}
+		if constexpr (gt_comparable_v<std::string, T>){
+			if(std::holds_alternative<std::string>(*this))
+				return std::get<std::string>(*this) > t;
+		}
+		return false;
+	}
+
+	template<class T>
+	bool operator<=(T&& t) const noexcept {
+		return !((*this) > t);
+	}
+
 	template<class T>
 	T& as(){
 		return std::get<T>(*this);
@@ -89,15 +174,27 @@ public:
 	}
 };
 
+
+bool operator<(std::string_view str, const Scalar& s);
+
 class Node;
 
 using List = std::vector<Node>;
 
-using DictBase = std::map<Scalar, Node>;
+// std::less<> for using count() and find with std::string_view
+using DictBase = std::map<Scalar, Node, std::less<>>;
 
 class Dict: public DictBase{
 public:
 	using DictBase::DictBase;
+
+
+	template<class T>
+	Node& operator[](T&& t){
+		return (*static_cast<DictBase*>(this))[std::forward<T>(t)];
+	}
+
+	Node& operator[](std::string_view key);
 
 	Dict& left_union(const Dict& other);
 	Dict& right_union(const Dict& other);
@@ -121,6 +218,7 @@ public:
 	};
 
 	Node(const Config& conf);
+	Node(Config&& conf);
 
 	Node(const boostpt::ptree& tree);
 
@@ -167,15 +265,15 @@ public:
 };
 
 
-std::string indent_str(int indent){
+inline std::string indent_str(int indent){
 	return std::string(indent*4, ' ');
 }
 
-void print(const Scalar& s, int indent){
+inline void print(const Scalar& s, int indent){
 	std::cerr << indent_str(indent) << s.cast<std::string>() << '\n';
 }
 
-void print(const Node& node, int indent=0){
+inline void print(const Node& node, int indent=0){
 	if(node.is_scalar()){
 		print(node.as_scalar(), indent);
 	}

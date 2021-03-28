@@ -1,5 +1,6 @@
 #include "rtfw/detail/core.hpp"
 #include "rtfw/detail/util.hpp"
+#include "propertytree.hpp"
 
 #include <iostream>
 
@@ -9,18 +10,28 @@ namespace rtfw{
 namespace detail{
 using namespace std::literals::chrono_literals;
 
+namespace pt = propertytree;
+
 
 namespace {
 
 
-void config(List& module_list){
+pt::Node config(List& module_list){
 	auto* iter = module_list.first();
+	pt::Node dict{pt::Dict()};
 	while(iter){
 		auto* ptr = static_cast<ModuleHolder*>(iter);
 		std::cerr << "configuring " << ptr->name() << '\n';
-		ptr->config();
+		auto conf = ptr->config();
+		if(conf.name() != ""){
+			if(dict.as_dict().count(conf.name()))
+				throw std::runtime_error("Conflicting module names");
+			pt::Node tmp{std::move(conf)};
+			dict.as_dict().left_union(tmp.as_dict());
+		}
 		iter = List::next(*iter);
 	}
+	return dict;
 }
 
 void init(List& init_stack, List& module_list){

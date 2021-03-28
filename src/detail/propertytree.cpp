@@ -13,6 +13,23 @@ Node* try_at(Dict& d, const Scalar& k){
 }
 }
 
+
+bool operator<(std::string_view sv, const Scalar& s){
+	return s > sv;
+}
+
+
+
+Node& Dict::operator[](std::string_view str){
+	auto iter = find(str);
+	if(iter == end()){
+		auto [new_iter, success] = insert(Dict::value_type(std::string(str), Node{}));
+		if(!success) throw std::runtime_error("Could not insert into the map");
+		iter = new_iter;
+	}
+	return iter->second;
+}
+
 Dict& Dict::left_union(const Dict& other){
 	for(const auto& [key, onode] : other){
 		if(auto tnode = try_at(*this, key)){
@@ -75,9 +92,17 @@ Dict& Dict::right_intersect(const Dict& other){
 }
 
 Node::Node(const Config& conf): NodeBase{Dict()} {
-	as_dict()[std::string(conf.name())] = Dict();
+	as_dict()[conf.name()] = Dict();
 	for(const auto& [key, value]: conf){
-		as_dict()[std::string(conf.name())].as_dict()[key] = value;
+		as_dict()[conf.name()].as_dict()[key] = value;
+	}
+}
+
+
+Node::Node(Config&& conf): NodeBase{Dict()} {
+	as_dict()[conf.name()] = Dict();
+	for(auto&& [key, value] : conf){
+		as_dict()[conf.name()].as_dict()[key] = std::move(value);
 	}
 }
 

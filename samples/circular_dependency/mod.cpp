@@ -5,7 +5,9 @@ struct Mod3;
 
 struct Mod1{
 
-	static void config(){}
+	static rtfw::Config config(){
+		return {};
+	}
 	
 	Mod1(): ref{rtfw::module<Mod2>()}{}
 	Mod2* ref;
@@ -14,7 +16,9 @@ struct Mod1{
 
 struct Mod2{
 
-	static void config(){}
+	static rtfw::Config config(){
+		return {};
+	}
 	
 	Mod2(): ref{rtfw::module<Mod3>()}{}
 	Mod3* ref;
@@ -23,7 +27,9 @@ struct Mod2{
 
 struct Mod3{
 
-	static void config(){}
+	static rtfw::Config config(){
+		return {};
+	}
 	
 	Mod3(): ref{rtfw::module<Mod1>()}{}
 	Mod1* ref;
