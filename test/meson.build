@@ -8,7 +8,6 @@ tests = [
 	{'name': 'util', 'srcs': ['util.cpp']},
 	{'name': 'assertion', 'srcs': ['assertion.cpp']},
 	{'name': 'config', 'srcs': ['config.cpp']},
-	{'name': 'vectormap', 'srcs': ['vectormap.cpp']},
 	{'name': 'propertytree', 'srcs': ['propertytree.cpp']},
 ]
 

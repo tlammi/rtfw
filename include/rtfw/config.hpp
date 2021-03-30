@@ -2,17 +2,23 @@
 
 #include <vector>
 #include <utility>
+#include <map>
 #include "boost/lexical_cast.hpp"
 
-#include "rtfw/detail/vectormap.hpp"
 
 namespace rtfw {
 
-class Config{
+class Config: public std::map<std::string, std::string, std::less<>> {
 public:
 
-	Config(std::string_view name="", const std::vector<std::string_view>& keys={}):
-		name_{name}, map_{keys} {}
+	using Parent = std::map<std::string, std::string, std::less<>>;
+
+	Config(std::string_view name="", std::initializer_list<std::string> keys={}):
+		name_{name} {
+			for(const auto& k: keys){
+				(*this)[k] = "";
+			}
+		}
 
 	Config(const Config&) = default;
 	Config(Config&&) = default;
@@ -20,41 +26,44 @@ public:
 	Config& operator=(const Config&) = default;
 	Config& operator=(Config&&) = default;
 
-	void set_name(std::string_view name){
-		name_ = name;
+	std::string& name() {
+		return name_;
 	}
-
-	std::string_view name() const noexcept{
+	
+	const std::string& name() const {
 		return name_;
 	}
 
-
 	template<class T=std::string_view>
 	T value(std::string_view key) const {
-		return boost::lexical_cast<T>(map_[key]);
+		return boost::lexical_cast<T>(at(key));
 	}
 
-	void set(std::string_view key, std::string_view val){
-		map_[key] = val;
+	std::string& operator[](std::string_view str){
+		auto iter = find(str);
+		if(iter == end()){
+			auto [new_iter, success] = insert(Parent::value_type(std::string(str), std::string()));
+			if(!success) throw std::runtime_error("Could not insert into the map");
+			iter = new_iter;
+		}
+		return iter->second;
 	}
 
 
-	auto begin() const {
-		return map_.begin();
-	}
-
-	auto end() const {
-		return map_.end();
+	const std::string& at(std::string_view str) const {
+		auto iter = find(str);
+		if(iter != end())
+			return iter->second;
+		throw std::runtime_error("map at()");
 	}
 
 private:
 	std::string name_{};
-	detail::VectorMap<std::string, std::string> map_;
 };
 
 template<>
 inline std::string_view Config::value<std::string_view>(std::string_view key) const {
-	return map_[key];
+	return this->at(key);
 }
 
 }

@@ -16,26 +16,26 @@ TEST(Config, Name){
 	ASSERT_EQ(c0.name(), "");
 	Config c1{"name"};
 	ASSERT_EQ(c1.name(), "name");
-	c1.set_name("asdf");
+	c1.name() = "asdf";
 	ASSERT_EQ(c1.name(), "asdf");
 }
 
 TEST(Config, Access){
 	Config c0{"config", {"key0", "key1", "asdf"}};
-	c0.set("key0", "100");
-	c0.set("key1", "another");
-	c0.set("asdf", "A");
+	c0["key0"] = "100";
+	c0["key1"] = "another";
+	c0["key2"] = "A";
 
 	ASSERT_EQ(c0.value<int>("key0"), 100);
 	ASSERT_EQ(c0.value<std::string>("key1"), "another");
-	ASSERT_EQ(c0.value("asdf"), "A");
+	ASSERT_EQ(c0.value("asdf"), "");
 	ASSERT_ANY_THROW(c0.value("does not exist"));
 
 }
 
 TEST(Config, ConstAccess){
 	Config c0{"config", {"key0", "key1", "asdf"}};
-	c0.set("key0", "100");
+	c0["key0"] = "100";
 	auto lambda = [](const Config& c){
 		EXPECT_EQ(c.value<std::string>("key0"), "100");
 	};
@@ -44,10 +44,10 @@ TEST(Config, ConstAccess){
 
 TEST(Config, Iterate){
 	Config c{"conf", {"a", "b", "c", "d"}};
-	c.set("a", "A");
-	c.set("b", "B");
-	c.set("c", "C");
-	c.set("d", "D");
+	c["a"] = "A";
+	c["b"] = "B";
+	c["c"] = "C";
+	c["d"] = "D";
 
 	auto iter = c.begin();
 	ASSERT_EQ(iter->first, "a");

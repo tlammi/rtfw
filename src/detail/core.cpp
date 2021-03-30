@@ -93,7 +93,7 @@ pt::Node invoke_configs(List& module_list){
 		std::cerr << "configuring " << ptr->name() << '\n';
 		auto& conf = ptr->config();
 		if(conf.name() == "")
-			conf.set_name(ptr->name());
+			conf.name() = ptr->name();
 
 		if(dict.as_dict().count(conf.name()))
 			throw std::runtime_error("Conflicting module names");
