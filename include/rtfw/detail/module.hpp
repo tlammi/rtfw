@@ -18,7 +18,7 @@ public:
 	virtual ~ModuleHolder(){}
 
 	virtual std::string_view name() const noexcept = 0;
-	virtual rtfw::Config config() = 0;
+	virtual rtfw::Config& config() = 0;
 	virtual void init(const rtfw::Config& conf) = 0;
 	virtual void clear() = 0;
 private:
@@ -31,7 +31,7 @@ public:
 	
 	static inline ModuleHolderImpl<T>* instance{nullptr};
 
-	ModuleHolderImpl(std::string_view name): ModuleHolder(), name_{name}{
+	ModuleHolderImpl(std::string_view name): ModuleHolder(), name_{name}, conf_{T::config()}{
 		instance = this;
 	}
 
@@ -40,8 +40,8 @@ public:
 	}
 
 
-	Config config() final {
-		return T::config();
+	Config& config() final {
+		return conf_;
 	}
 
 	void init(const rtfw::Config& conf) final {
@@ -61,6 +61,7 @@ public:
 private:
 	std::string_view name_;
 	std::optional<T> opt_{std::nullopt};
+	Config conf_;
 };
 }
 }

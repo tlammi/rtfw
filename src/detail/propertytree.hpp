@@ -264,6 +264,7 @@ public:
 	Dict& as_dict();
 
 	const Dict& as_dict() const;
+
 };
 
 

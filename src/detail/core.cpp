@@ -91,7 +91,7 @@ pt::Node invoke_configs(List& module_list){
 	while(iter){
 		auto* ptr = static_cast<ModuleHolder*>(iter);
 		std::cerr << "configuring " << ptr->name() << '\n';
-		auto conf = ptr->config();
+		auto& conf = ptr->config();
 		if(conf.name() == "")
 			conf.set_name(ptr->name());
 

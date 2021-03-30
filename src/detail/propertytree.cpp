@@ -184,7 +184,6 @@ const Dict& Node::as_dict() const {
 	return std::get<Dict>(*this);
 }
 
-
 }
 }
 }

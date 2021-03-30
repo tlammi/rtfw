@@ -23,7 +23,7 @@ public:
 	T* module(){
 
 		assert_eq(std::this_thread::get_id(), rtfw_thread_id_, "module() is not threadsafe");
-		assert_false(setup_, "module() can only be called in module constructor (for explicit ownership");
+		assert_false(setup_, "module() can only be called in module constructor (for explicit ownership)");
 
 		auto* holder = ModuleHolderImpl<T>::instance;
 		if(!holder) throw std::runtime_error("Module not found");
