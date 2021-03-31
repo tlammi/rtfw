@@ -204,6 +204,9 @@ public:
 	Dict& left_intersect(const Dict& other);
 	Dict& right_intersect(const Dict& other);
 
+
+	std::vector<Config> to_configs() const;
+
 private:
 };
 

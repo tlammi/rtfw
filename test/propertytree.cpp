@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
@@ -112,4 +113,29 @@ TEST(PropertyTree, Subtract){
 	d0 -= d1;
 	ASSERT_EQ(d0, expected);
 	ASSERT_NE(d0, empty);
+}
+
+
+TEST(PropertyTree, ToConfigs){
+	pt::Dict d{};
+	d["Mod1"] = pt::Dict();
+	d["Mod2"] = pt::Dict();
+	d["Mod1"].as_dict()["key0"] = "100";
+	d["Mod1"].as_dict()["key1"] = "42";
+	d["Mod2"].as_dict()["key0"] = "100";
+
+	auto confs = d.to_configs();
+	ASSERT_EQ(confs.size(), 2);
+	std::vector<std::string> names;
+	for(const auto& c: confs)
+		names.push_back(c.name());
+	ASSERT_THAT(names, testing::ElementsAre("Mod1", "Mod2"));
+
+	for(const auto& c: confs){
+		ASSERT_EQ(c.at("key0"), "100");
+		if(c.name() == "Mod1"){
+			ASSERT_EQ(c.at("key1"), "42");
+		}
+	}
+
 }

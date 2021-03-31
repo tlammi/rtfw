@@ -11,6 +11,38 @@ Node* try_at(Dict& d, const Scalar& k){
 		return &d.at(k);
 	return nullptr;
 }
+
+
+template<class Iter>
+std::string join(Iter iter, Iter end, char sep){
+	std::string str;
+	while(iter != end){
+		str += *iter;
+		++iter;
+		if(iter != end)
+			str.push_back(sep);
+	}
+	return str;
+}
+
+void to_config(const Node& n, Config& c, std::vector<std::string>& stack, char separator='.'){
+	switch(n.type()){
+	case Node::Type::Dict:
+		for(const auto& [key, node] : n.as_dict()){
+			stack.push_back(key.as<std::string>());
+			to_config(node, c, stack, separator);
+			stack.pop_back();
+		}
+		break;
+	case Node::Type::List:
+		throw std::runtime_error("list support is not implemented yet");
+		break;
+	case Node::Type::Scalar:
+		c[join(stack.begin(), stack.end(), separator)] = n.as_scalar().as<std::string>();
+		break;
+	}
+}
+
 }
 
 
@@ -103,6 +135,17 @@ Dict& Dict::right_intersect(const Dict& other){
 	}
 	*this = tmp;
 	return *this;
+}
+
+
+std::vector<Config> Dict::to_configs() const {
+	std::vector<Config> confs;
+	for(const auto& [key, node]: *this){
+		confs.emplace_back(key.as<std::string>());
+		std::vector<std::string> key_stack;
+		to_config(node, confs.back(), key_stack);
+	}
+	return confs;
 }
 
 Node::Node(const Config& conf): NodeBase{Dict()} {
